@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>re() / regex{} — hoja de referencia Python</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0d12;
+    --panel:#11151c;
+    --panel-2:#161b24;
+    --border:#232a35;
+    --text:#e7eaf0;
+    --text-2:#98a2b3;
+    --text-muted:#5f6a7a;
+
+    --teal:#5fe3c9; --teal-dim:#1c3630;
+    --amber:#f7c169; --amber-dim:#3a2f18;
+    --coral:#ff9270; --coral-dim:#3a2318;
+    --violet:#c3a6ff; --violet-dim:#2a2140;
+    --rose:#ff8fb1; --rose-dim:#3a1f2a;
+    --blue:#7db8ff; --blue-dim:#182a3d;
+    --green:#8fe08f; --green-dim:#203320;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    padding:0 0 4rem;
+  }
+  code, .code{font-family:'JetBrains Mono', monospace;}
+
+  header{
+    padding:2.5rem 3rem 1.75rem;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:1rem 2rem;
+  }
+  .brand{display:flex; align-items:baseline; gap:.9rem;}
+  .brand h1{
+    font-family:'Inter', sans-serif;
+    font-size:1.55rem;
+    font-weight:600;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .brand h1 .re{color:var(--teal);}
+  .brand h1 .rx{color:var(--violet);}
+  .brand p{
+    margin:.35rem 0 0;
+    font-size:.82rem;
+    color:var(--text-2);
+    font-family:'Inter', sans-serif;
+  }
+  header .meta{
+    font-size:.72rem;
+    color:var(--text-muted);
+    font-family:'Inter', sans-serif;
+    text-align:right;
+    line-height:1.6;
+  }
+
+  main{
+    column-count:3;
+    column-gap:1.25rem;
+    padding:1.5rem 3rem 0;
+  }
+  @media (max-width:1100px){ main{column-count:2;} }
+  @media (max-width:680px){ main{column-count:1; padding:1.25rem 1.25rem 0;} header{padding:2rem 1.25rem 1.5rem;} }
+
+  section{
+    break-inside:avoid;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:1.1rem 1.2rem 1.3rem;
+    margin:0 0 1.25rem;
+  }
+  section.wide{column-span:all;}
+
+  section h2{
+    font-family:'Inter', sans-serif;
+    font-size:.72rem;
+    font-weight:600;
+    letter-spacing:.02em;
+    margin:0 0 .9rem;
+    color:var(--text);
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+  }
+  section h2 .dot{
+    width:7px; height:7px; border-radius:50%; flex:none;
+  }
+
+  table{width:100%; border-collapse:collapse; font-size:.76rem;}
+  tr{border-bottom:1px solid var(--border);}
+  tr:last-child{border-bottom:none;}
+  td{padding:.4rem .3rem; vertical-align:top; line-height:1.45;}
+  td.pat{
+    white-space:nowrap;
+    color:var(--code-color, var(--teal));
+    font-weight:500;
+    padding-right:.6rem;
+    width:1%;
+  }
+  td.desc{color:var(--text-2); font-family:'Inter', sans-serif; font-size:.74rem;}
+  td.find{color:var(--text-muted); font-size:.73rem; white-space:nowrap;}
+  .ex{color:var(--text-muted); font-size:.72rem; display:block; margin-top:.25rem; line-height:1.55;}
+  .ex .t{display:block; color:var(--text-muted);}
+  .ex .c{display:block; color:var(--text-2);}
+  .ex b{color:var(--text); font-weight:400;}
+
+  .teal .dot{background:var(--teal);} .teal td.pat{color:var(--teal);}
+  .amber .dot{background:var(--amber);} .amber td.pat{color:var(--amber);}
+  .coral .dot{background:var(--coral);} .coral td.pat{color:var(--coral);}
+  .violet .dot{background:var(--violet);} .violet td.pat{color:var(--violet);}
+  .rose .dot{background:var(--rose);} .rose td.pat{color:var(--rose);}
+  .blue .dot{background:var(--blue);} .blue td.pat{color:var(--blue);}
+  .green .dot{background:var(--green);} .green td.pat{color:var(--green);}
+
+  .funcs{display:flex; flex-direction:column; gap:.55rem;}
+  .funcs .row{font-size:.76rem; line-height:1.5;}
+  .funcs .row .fn{color:var(--teal); font-weight:500;}
+  .funcs .row .d{color:var(--text-2); font-family:'Inter', sans-serif; font-size:.74rem;}
+  .funcs .row .ex{color:var(--text-muted); display:block; margin-top:.1rem;}
+
+  .codewrap{display:grid; grid-template-columns:1fr 1fr; gap:1rem;}
+  @media (max-width:680px){ .codewrap{grid-template-columns:1fr;} }
+  .codeblock{
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:.9rem 1rem;
+    overflow-x:auto;
+  }
+  .codeblock .tag{
+    font-family:'Inter', sans-serif;
+    font-size:.68rem;
+    font-weight:600;
+    letter-spacing:.03em;
+    margin:0 0 .6rem;
+    display:inline-block;
+    padding:.15rem .5rem;
+    border-radius:4px;
+  }
+  .tag.re{background:var(--teal-dim); color:var(--teal);}
+  .tag.rx{background:var(--violet-dim); color:var(--violet);}
+  pre{
+    margin:0; font-size:.74rem; line-height:1.6; color:var(--text);
+    white-space:pre-wrap; word-break:break-word;
+  }
+  .cm{color:var(--text-muted);}
+  .kw{color:var(--blue);}
+  .fn2{color:var(--teal);}
+  .str{color:var(--green);}
+  .rxf{color:var(--violet);}
+
+  .note{
+    font-family:'Inter', sans-serif;
+    font-size:.74rem;
+    color:var(--text-2);
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:.6rem .8rem;
+    margin-top:.7rem;
+    line-height:1.55;
+  }
+  .note b{color:var(--text); font-weight:600;}
+
+  footer{
+    padding:1.5rem 3rem 0;
+    font-family:'Inter', sans-serif;
+    font-size:.72rem;
+    color:var(--text-muted);
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1><span class="re">re()</span> <span style="color:var(--text-muted); font-weight:400;">vs</span> <span class="rx">regex{}</span></h1>
+    <p>hoja de referencia — Python, clase 04</p>
+  </div>
+  <div class="meta">re: librería estándar<br>regex: pip install regex</div>
+</header>
+
+<main>
+
+  <section class="teal">
+    <h2><span class="dot"></span>Métodos de re</h2>
+    <table>
+      <tr><td class="pat">re.search()</td><td class="desc">primera coincidencia en cualquier parte<span class="ex"><span class="t">text = "A1 PEDIDO"</span><span class="c">re.search(r'\d', text) → <b>'1'</b></span></span></td></tr>
+      <tr><td class="pat">re.match()</td><td class="desc">coincidencia solo al inicio<span class="ex"><span class="t">text = "1A PEDIDO"</span><span class="c">re.match(r'\d', text) → <b>'1'</b></span></span></td></tr>
+      <tr><td class="pat">re.findall()</td><td class="desc">todas las coincidencias, como lista<span class="ex"><span class="t">text = "1A2 PEDIDO"</span><span class="c">re.findall(r'\d', text) → <b>['1','2']</b></span></span></td></tr>
+      <tr><td class="pat">re.finditer()</td><td class="desc">iterador de objetos Match<span class="ex"><span class="t">text = "1A2"</span><span class="c">re.finditer(r'\d', text) → <b>&lt;iterador&gt;</b></span></span></td></tr>
+      <tr><td class="pat">re.sub()</td><td class="desc">reemplaza coincidencias<span class="ex"><span class="t">text = "1A2"</span><span class="c">re.sub(r'\d', 'X', text) → <b>'XAX'</b></span></span></td></tr>
+      <tr><td class="pat">re.split()</td><td class="desc">divide el texto por el patrón<span class="ex"><span class="t">text = "A-B-C"</span><span class="c">re.split(r'-', text) → <b>['A','B','C']</b></span></span></td></tr>
+    </table>
+  </section>
+
+  <section class="amber">
+    <h2><span class="dot"></span>Clases de caracteres</h2>
+    <table>
+      <tr><td class="pat">.</td><td class="desc">cualquier carácter, no salto de línea<span class="ex"><span class="t">text = "cat cot c9t"</span><span class="c">re.findall(r'c.t', text) → <b>['cat','cot','c9t']</b></span></span></td></tr>
+      <tr><td class="pat">\.</td><td class="desc">punto literal (escapado)<span class="ex"><span class="t">text = "www.ejemplo.com"</span><span class="c">re.search(r'www\.ejemplo', text) → <b>'www.ejemplo'</b></span></span></td></tr>
+      <tr><td class="pat">\d</td><td class="desc">un dígito (0–9)<span class="ex"><span class="t">text = "clave059"</span><span class="c">re.findall(r'\d', text) → <b>['0','5','9']</b></span></span></td></tr>
+      <tr><td class="pat">\w</td><td class="desc">letra, dígito o _<span class="ex"><span class="t">text = "a_1!"</span><span class="c">re.findall(r'\w', text) → <b>['a','_','1']</b></span></span></td></tr>
+      <tr><td class="pat">\s</td><td class="desc">espacio en blanco<span class="ex"><span class="t">text = "hola mundo"</span><span class="c">re.findall(r'\s', text) → <b>[' ']</b></span></span></td></tr>
+      <tr><td class="pat">\D \W \S</td><td class="desc">lo que NO es \d \w \s<span class="ex"><span class="t">text = "a#1"</span><span class="c">re.findall(r'\D', text) → <b>['a','#']</b></span></span></td></tr>
+    </table>
+  </section>
+
+  <section class="coral">
+    <h2><span class="dot"></span>Cuantificadores</h2>
+    <table>
+      <tr><td class="pat">{n}</td><td class="desc">exactamente n veces<span class="ex"><span class="t">text = "código 123"</span><span class="c">re.search(r'\d{3}', text) → <b>'123'</b></span></span></td></tr>
+      <tr><td class="pat">{n,m}</td><td class="desc">entre n y m veces<span class="ex"><span class="t">text = "12 123 1234"</span><span class="c">re.findall(r'\d{2,4}', text) → <b>['12','123','1234']</b></span></span></td></tr>
+      <tr><td class="pat">+</td><td class="desc">una o más veces<span class="ex"><span class="t">text = "total 7890"</span><span class="c">re.search(r'\d+', text) → <b>'7890'</b></span></span></td></tr>
+      <tr><td class="pat">*</td><td class="desc">cero o más veces<span class="ex"><span class="t">text = "gato gaato gaaato"</span><span class="c">re.findall(r'ga*to', text) → <b>['gato','gaato','gaaato']</b></span></span></td></tr>
+      <tr><td class="pat">?</td><td class="desc">cero o una vez (opcional)<span class="ex"><span class="t">text = "color colour"</span><span class="c">re.findall(r'colou?r', text) → <b>['color','colour']</b></span></span></td></tr>
+    </table>
+  </section>
+
+  <section class="violet">
+    <h2><span class="dot"></span>Conjuntos y grupos</h2>
+    <table>
+      <tr><td class="pat">[abc]</td><td class="desc">cualquiera de estos caracteres<span class="ex"><span class="t">text = "casa"</span><span class="c">re.findall(r'[aeiou]', text) → <b>['a','a']</b></span></span></td></tr>
+      <tr><td class="pat">[A-Z] [a-z]</td><td class="desc">rango de mayúsculas / minúsculas<span class="ex"><span class="t">text = "Hola Mundo"</span><span class="c">re.findall(r'[A-Z][a-z]+', text) → <b>['Hola','Mundo']</b></span></span></td></tr>
+      <tr><td class="pat">[^abc]</td><td class="desc">todo excepto estos caracteres<span class="ex"><span class="t">text = "a1!b2"</span><span class="c">re.findall(r'[^0-9]', text) → <b>['a','!','b']</b></span></span></td></tr>
+      <tr><td class="pat">(abc)</td><td class="desc">grupo de captura<span class="ex"><span class="t">text = "01/12"</span><span class="c">re.search(r'(\d{2})/(\d{2})', text).groups() → <b>('01','12')</b></span></span></td></tr>
+      <tr><td class="pat">(?P&lt;n&gt;...)</td><td class="desc">grupo con nombre<span class="ex"><span class="t">text = "manzana"</span><span class="c">re.search(r'(?P&lt;fruta&gt;\w+)', text).group('fruta') → <b>'manzana'</b></span></span></td></tr>
+    </table>
+  </section>
+
+  <section class="rose">
+    <h2><span class="dot"></span>Anclas y límites</h2>
+    <table>
+      <tr><td class="pat">^</td><td class="desc">inicio de la cadena<span class="ex"><span class="t">text = "123 abc"</span><span class="c">re.match(r'^\d+', text) → <b>'123'</b></span></span></td></tr>
+      <tr><td class="pat">$</td><td class="desc">fin de la cadena<span class="ex"><span class="t">text = "abc 123"</span><span class="c">re.search(r'\d+$', text) → <b>'123'</b></span></span></td></tr>
+      <tr><td class="pat">\b</td><td class="desc">límite de palabra<span class="ex"><span class="t">text = "RUC RUCA"</span><span class="c">re.findall(r'\bRUC\b', text) → <b>['RUC']</b></span></span></td></tr>
+    </table>
+  </section>
+
+  <section class="green">
+    <h2><span class="dot"></span>Exclusivo de regex</h2>
+    <div class="funcs">
+      <div class="row"><span class="fn">(?&lt;=...)</span> con <span class="fn">{n,}</span> o <span class="fn">+</span>
+        <span class="d">— lookbehind de longitud variable</span>
+        <span class="ex"><span class="t">text = "precio 1500 soles"</span><span class="c">regex.findall(r'(?&lt;=\d{3,})\s*soles', text) → <b>[' soles']</b></span></span></div>
+      <div class="row"><span class="fn">(...){e&lt;=N}</span>
+        <span class="d">— búsqueda difusa, tolera N errores</span>
+        <span class="ex"><span class="t">text = "el gerente aprovó"</span><span class="c">regex.search(r'(aprobó){e&lt;=1}', text).group() → <b>'aprovó'</b></span></span></div>
+      <div class="row"><span class="fn">\p{L}</span> / <span class="fn">\p{Han}</span>
+        <span class="d">— letra de cualquier idioma / solo Han</span>
+        <span class="ex"><span class="t">text = "José 田中 Müller"</span><span class="c">regex.findall(r'\p{L}+', text) → <b>['José','田中','Müller']</b></span></span></div>
+      <div class="row"><span class="fn">(?P&lt;x&gt;...)</span> repetido
+        <span class="d">— mismo nombre de grupo varias veces</span>
+        <span class="ex"><span class="t">text = "manzana, pera, uva"</span><span class="c">regex.findall(r'(?P&lt;fruta&gt;\w+)', text) → <b>['manzana','pera','uva']</b></span></span></div>
+      <div class="row"><span class="fn">(?R)</span>
+        <span class="d">— patrón recursivo, para anidados</span>
+        <span class="ex"><span class="t">text = "(uno (dos) uno)"</span><span class="c">regex.search(r'\((?:[^()]|(?R))*\)', text).group() → <b>'(uno (dos) uno)'</b></span></span></div>
+      <div class="row"><span class="fn">overlapped=True</span>
+        <span class="d">— coincidencias solapadas en findall</span>
+        <span class="ex"><span class="t">text = "aaaa"</span><span class="c">regex.findall(r'aa', text, overlapped=True) → <b>['aa','aa','aa']</b></span></span></div>
+    </div>
+  </section>
+
+  <section class="wide">
+    <h2><span class="dot" style="background:var(--blue);"></span>re vs regex — mismo problema, dos motores</h2>
+    <div class="codewrap">
+      <div class="codeblock">
+        <span class="tag re">re — estándar</span>
+        <pre><span class="kw">import</span> re
+
+texto = <span class="str">"El RUC de la empresa es 20123456789 en el año 2026."</span>
+
+<span class="cm"># patrón de 11 dígitos con límite de palabra</span>
+ruc = re.<span class="fn2">search</span>(<span class="rxf">r'\b\d{11}\b'</span>, texto)
+
+<span class="kw">if</span> ruc:
+    <span class="fn2">print</span>(ruc.group())
+<span class="cm"># 20123456789</span></pre>
+      </div>
+      <div class="codeblock">
+        <span class="tag rx">regex — avanzado</span>
+        <pre><span class="kw">import</span> regex
+
+<span class="cm"># 1. coincidencias solapadas</span>
+secuencia = <span class="str">"aaaa"</span>
+r = regex.<span class="fn2">findall</span>(<span class="rxf">r'aa'</span>, secuencia, overlapped=<span class="kw">True</span>)
+<span class="cm"># ['aa', 'aa', 'aa']</span>
+
+<span class="cm"># 2. lookbehind de longitud variable — prohibido en re</span>
+texto2 = <span class="str">"ID_CLIENTE_A_10293"</span>
+id_ = regex.<span class="fn2">search</span>(<span class="rxf">r'(?&lt;=ID_CLIENTE_.*_)\d+'</span>, texto2)
+<span class="fn2">print</span>(id_.group())
+<span class="cm"># 10293</span></pre>
+      </div>
+    </div>
+    <div class="note"><b>Nota:</b> ambos módulos usan raw strings (<code>r'...'</code>) para que Python no interprete <code>\d</code> o <code>\b</code> como escapes comunes. En consultas SQL (DuckDB, PostgreSQL) aplica la misma regla.</div>
+  </section>
+
+</main>
+
+<footer>re — viene con Python. regex — pip install regex, para lookbehind variable, fuzzy matching, Unicode extendido y patrones recursivos.</footer>
+
+</body>
+</html>
